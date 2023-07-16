@@ -1,4 +1,4 @@
-package main
+package twosshlib
 
 import (
 	"fmt"
@@ -16,11 +16,11 @@ import (
 //
 // var (
 //
-//		User     string = "developer"
-//		Password string = "C1sco12345"
-//		hostname string = "192.168.1.11"
-//	 port     string = "2222"
-//		cmds            = []string{"show ip route | i 0.0.0.0/0", "show ip arp"}
+//	User     string = "developer"
+//	Password string = "C1sco12345"
+//	hostname string = "192.168.1.11"
+//      port     string = "2222"
+//	cmds            = []string{"show ip route | i 0.0.0.0/0", "show ip arp"}
 //
 // )
 //
