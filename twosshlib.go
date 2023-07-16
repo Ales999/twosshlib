@@ -11,15 +11,17 @@ import (
 
 // Выполнить подключение с первому, далее ко второму, на втором выполнить команду,
 // отключится от второго, выполнить команду на первом и отключится.
-func FirstTwoNextOne(oneHostIp []string, onePort, twoHostIp, twoPort, user, password, oneCommand, twoCommand string) (string, error) {
+func FirstTwoNextOne(oneHostIp []string, onePort, twoHostIp, user, password, oneCommand, twoCommand string) (string, error) {
 
 	//
 	var sb strings.Builder
 	// Предварительно выделяем сразу память
-	sb.Grow(len(twoHostIp) + 1 + len(twoPort) + len(oneCommand) + len(twoCommand))
+	sb.Grow(len(twoHostIp) + 1 + +len(oneCommand) + len(twoCommand))
 	// Собираем строку что будем выполнять на первом роутере
 	sb.WriteString("ssh -l ")
 	sb.WriteString(user)
+	sb.WriteString(" ")
+	sb.WriteString(twoHostIp)
 	sb.WriteString(" ")
 	sb.WriteString(password)
 	sb.WriteString(" ")
@@ -27,6 +29,7 @@ func FirstTwoNextOne(oneHostIp []string, onePort, twoHostIp, twoPort, user, pass
 	sb.WriteString(" ")
 	sb.WriteString("exit ")
 	sb.WriteString(oneCommand)
+	sb.WriteString(" ")
 	sb.WriteString("exit")
 
 	var cmdsstr = sb.String()
