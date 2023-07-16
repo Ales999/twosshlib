@@ -1,4 +1,4 @@
-package twosshlib
+package twosshlibSsh
 
 import (
 	"fmt"
@@ -16,11 +16,11 @@ import (
 //
 // var (
 //
-//	User     string = "developer"
-//	Password string = "C1sco12345"
-//	hostname string = "192.168.1.11"
-//      port     string = "2222"
-//	cmds            = []string{"show ip route | i 0.0.0.0/0", "show ip arp"}
+//		User     string = "developer"
+//		Password string = "C1sco12345"
+//		hostname string = "192.168.1.11"
+//	     port     string = "2222"
+//		cmds            = []string{"show ip route | i 0.0.0.0/0", "show ip arp"}
 //
 // )
 //
@@ -35,7 +35,7 @@ import (
 //	}
 //
 //	results := executeCmd(hostname, port, cmds, config)
-func executeSsh(hostname string, port string, cmds []string, config *ssh.ClientConfig) string {
+func ExecuteSsh(hostname string, port string, cmds []string, config *ssh.ClientConfig) (string, error) {
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          0,     // disable echoing
 		ssh.TTY_OP_ISPEED: 14400, // input speed = 14.4kbaud
@@ -45,7 +45,7 @@ func executeSsh(hostname string, port string, cmds []string, config *ssh.ClientC
 	conn, err := ssh.Dial("tcp", hostname+":"+port, config)
 	if err != nil {
 		fmt.Println("Не могу подключится :-(")
-		log.Fatal("Failed to dial: ", err)
+		return "", &ssh.OpenChannelError{}
 	}
 	defer conn.Close()
 
@@ -53,6 +53,7 @@ func executeSsh(hostname string, port string, cmds []string, config *ssh.ClientC
 	session, err := conn.NewSession()
 	if err != nil {
 		log.Fatal("Failed to create session: ", err)
+		return "", &ssh.OpenChannelError{}
 	}
 	defer session.Close()
 
@@ -61,19 +62,19 @@ func executeSsh(hostname string, port string, cmds []string, config *ssh.ClientC
 	// are independent of each other.
 	err = session.RequestPty("xterm", 80, 40, modes)
 	if err != nil {
-		log.Fatalf("request for pseudo terminal failed: %s", err)
+		return "", fmt.Errorf("request for pseudo terminal failed: %s", err)
 	}
 	stdBuf, err := session.StdoutPipe()
 	if err != nil {
-		log.Fatalf("request for stdout pipe failed: %s", err)
+		return "", fmt.Errorf("request for stdout pipe failed: %s", err)
 	}
 	stdinBuf, err := session.StdinPipe()
 	if err != nil {
-		log.Fatalf("request for stdin pipe failed: %s", err)
+		return "", fmt.Errorf("request for stdin pipe failed: %s", err)
 	}
 	err = session.Shell()
 	if err != nil {
-		log.Fatalf("failed to start shell: %s", err)
+		return "", fmt.Errorf("failed to start shell: %s", err)
 	}
 
 	var cmd_output string
@@ -96,5 +97,5 @@ func executeSsh(hostname string, port string, cmds []string, config *ssh.ClientC
 		}
 	}
 
-	return cmd_output
+	return cmd_output, nil
 }
